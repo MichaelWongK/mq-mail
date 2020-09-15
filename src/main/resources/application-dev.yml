@@ -1,0 +1,63 @@
+server:
+  port: 8080
+spring:
+  resources:
+    static-locations: classpath:/templates/,classpath:/static/
+  mvc:
+    view:
+      suffix: .html
+
+  # redis
+  redis:
+    host: 49.234.52.233
+    port: 6379
+    password: 123456
+    lettuce:
+      pool:
+        max-active: 32
+        max-wait: -1
+        min-idle: 0
+    timeout: 0
+
+  # mysql
+  datasource:
+    url: jdbc:mysql://49.234.52.233:3306/mq-mail?useUnicode=true&characterEncoding=UTF-8&useOldAliasMetadataBehavior=true
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # mail
+  mail:
+    host: smtp.163.com
+    username: wangmk13@163.com
+    password: VOLEQGMUBYNSHRVV
+    from: wangmk13@163.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+
+  # rabbitmq
+  rabbitmq:
+    virtual-host: /
+    username: admin
+    password: admin
+    port: 5672
+    host: 49.234.52.233
+    # 开启confirms回调 P -> Exchange
+    publisher-confirm-type: simple
+    # 开启returnedMessage回调 Exchange -> Queue
+    publisher-returns: true
+    # 设置手动确认(ack) Queue -> C：
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 100
+
+
+#    listener.simple.prefetch: 100
