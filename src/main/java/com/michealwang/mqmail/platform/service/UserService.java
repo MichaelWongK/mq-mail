@@ -1,0 +1,21 @@
+package com.michealwang.mqmail.platform.service;
+
+
+import com.michealwang.mqmail.platform.pojo.User;
+
+import java.util.List;
+
+public interface UserService {
+
+    List<User> getAll();
+
+    User getOne(Integer id);
+
+    void add(User user);
+
+    void update(User user);
+
+    void delete(Integer id);
+
+    List<User> getByUsernameAndPassword(String username, String password);
+}
