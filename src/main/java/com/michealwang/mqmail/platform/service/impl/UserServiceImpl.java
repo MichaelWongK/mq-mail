@@ -8,12 +8,15 @@ import com.michealwang.mqmail.platform.mapper.UserMapper;
 import com.michealwang.mqmail.platform.pojo.User;
 import com.michealwang.mqmail.platform.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -23,6 +26,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private StringRedisUtils stringRedisUtils;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public List<User> getAll() {
@@ -57,9 +62,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public JSONResponse testIdempotence(String token) {
         Assert.notNull(token, ResponseCode.ILLEGAL_ARGUMENT.getMsg());
-        Assert.isTrue(stringRedisUtils.hasKey(token), ResponseCode.REPETITIVE_OPERATION.getMsg());
-        stringRedisUtils.delete(token);
-        return JSONResponse.success("操作成功");
+        RLock lock = null;
+        try {
+            lock = redissonClient.getLock("token");
+//            lock.lock();
+            boolean flag = lock.tryLock();
+            System.out.println(flag);
+            if (!flag) {
+                return null;
+            }
+            Assert.isTrue(stringRedisUtils.hasKey(token), ResponseCode.REPETITIVE_OPERATION.getMsg());
+            stringRedisUtils.delete(token);
+            return JSONResponse.success();
+        } finally {
+            if (null != lock) {
+                lock.unlock();
+            }
+        }
     }
 
 }

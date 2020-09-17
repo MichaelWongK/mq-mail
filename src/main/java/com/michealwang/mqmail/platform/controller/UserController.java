@@ -24,7 +24,9 @@ public class UserController {
     @GetMapping("{id}")
     public String getOne(@PathVariable Integer id) {
         User user = userService.getOne(id);
-        return user + "";
+        if (null != user)
+            return user.toString();
+        return "user not exits!";
     }
 
     @PostMapping("add")

@@ -3,6 +3,8 @@ package com.michealwang.mqmail.redis;
 import com.michealwang.mqmail.common.util.StringRedisUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -26,6 +28,20 @@ public class RedisTest {
 
     @Autowired
     private StringRedisUtils stringRedisUtils;
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @Test
+    public void redissonTest() throws InterruptedException {
+        String token = "token:u8uHgV75tugKSH8TpjRy2Y5C";
+        RLock lock = redissonClient.getLock("token");
+        boolean locked = lock.tryLock(0, 10, TimeUnit.SECONDS);
+        if (locked) {
+            Thread.sleep(60000);
+        }
+        lock.unlock();
+    }
 
     @Test
     public void getExpire() {
