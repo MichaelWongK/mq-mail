@@ -1,6 +1,7 @@
 package com.michealwang.mqmail.platform.service;
 
 
+import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.platform.pojo.User;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface UserService {
     void delete(Integer id);
 
     List<User> getByUsernameAndPassword(String username, String password);
+
+    JSONResponse testIdempotence(String token);
 }

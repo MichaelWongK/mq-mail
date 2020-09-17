@@ -1,5 +1,6 @@
 package com.michealwang.mqmail.platform.controller;
 
+import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.platform.pojo.User;
 import com.michealwang.mqmail.platform.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,11 @@ public class UserController {
     public String getByUsernameAndPassword(String username, String password) {
         List<User> users = userService.getByUsernameAndPassword(username, password);
         return users.toString();
+    }
+
+    @PostMapping("/testIdempotence")
+    public JSONResponse testIdempotence(String token) {
+        return userService.testIdempotence(token);
     }
 
 }

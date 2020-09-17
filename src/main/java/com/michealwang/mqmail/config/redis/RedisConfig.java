@@ -45,6 +45,7 @@ public class RedisConfig {
                 return bytes;
             }
         });
+//        template.setHashValueSerializer();
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }

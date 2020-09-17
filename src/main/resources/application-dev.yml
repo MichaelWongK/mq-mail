@@ -17,7 +17,8 @@ spring:
         max-active: 32
         max-wait: -1
         min-idle: 0
-    timeout: 0
+    timeout: 120
+    database: 0
 
   # mysql
   datasource:

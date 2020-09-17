@@ -25,6 +25,8 @@ public class TestController {
     @RequestMapping("jedis")
     public String jedis() {
 
+
+
 //        log.info(StringRedisUtils.opsForValue().set("aaa", "aaa"));
 //
 //        stringRedisUtils.set("aaa", "aaa");
