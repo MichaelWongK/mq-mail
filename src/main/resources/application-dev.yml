@@ -10,8 +10,8 @@ spring:
   # redis
   redis:
     host: 49.234.52.233
-    port: 6379
-    password: 123456
+    port: 26379
+    password: micheal13
     lettuce:
       pool:
         max-active: 32
@@ -50,11 +50,11 @@ spring:
     password: admin
     port: 5672
     host: 49.234.52.233
-    # ¿ªÆôconfirms»Øµ÷ P -> Exchange
+    # ï¿½ï¿½ï¿½ï¿½confirmsï¿½Øµï¿½ P -> Exchange
     publisher-confirm-type: simple
-    # ¿ªÆôreturnedMessage»Øµ÷ Exchange -> Queue
+    # ï¿½ï¿½ï¿½ï¿½returnedMessageï¿½Øµï¿½ Exchange -> Queue
     publisher-returns: true
-    # ÉèÖÃÊÖ¶¯È·ÈÏ(ack) Queue -> C£º
+    # ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½È·ï¿½ï¿½(ack) Queue -> Cï¿½ï¿½
     listener:
       simple:
         acknowledge-mode: manual

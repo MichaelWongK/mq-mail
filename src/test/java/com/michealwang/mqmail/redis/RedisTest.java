@@ -33,6 +33,11 @@ public class RedisTest {
     private RedissonClient redissonClient;
 
     @Test
+    public void TestDel() {
+        System.out.println("del token: " + stringRedisUtils.delete("11"));
+    }
+
+    @Test
     public void redissonTest() throws InterruptedException {
         String token = "token:u8uHgV75tugKSH8TpjRy2Y5C";
         RLock lock = redissonClient.getLock("token");

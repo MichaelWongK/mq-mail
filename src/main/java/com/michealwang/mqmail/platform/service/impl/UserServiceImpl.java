@@ -61,24 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public JSONResponse testIdempotence(String token) {
-        Assert.notNull(token, ResponseCode.ILLEGAL_ARGUMENT.getMsg());
-        RLock lock = null;
-        try {
-            lock = redissonClient.getLock("token");
-//            lock.lock();
-            boolean flag = lock.tryLock();
-            System.out.println(flag);
-            if (!flag) {
-                return null;
-            }
-            Assert.isTrue(stringRedisUtils.hasKey(token), ResponseCode.REPETITIVE_OPERATION.getMsg());
-            stringRedisUtils.delete(token);
-            return JSONResponse.success();
-        } finally {
-            if (null != lock) {
-                lock.unlock();
-            }
-        }
+        return JSONResponse.success("delete success !");
     }
 
 }

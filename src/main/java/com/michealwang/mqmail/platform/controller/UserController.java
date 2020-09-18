@@ -1,5 +1,7 @@
 package com.michealwang.mqmail.platform.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.michealwang.mqmail.common.annotation.ApiIdempotent;
 import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.platform.pojo.User;
 import com.michealwang.mqmail.platform.service.UserService;
@@ -53,7 +55,8 @@ public class UserController {
         return users.toString();
     }
 
-    @PostMapping("/testIdempotence")
+    @RequestMapping("/testIdempotence")
+    @ApiIdempotent
     public JSONResponse testIdempotence(String token) {
         return userService.testIdempotence(token);
     }

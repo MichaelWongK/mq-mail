@@ -41,12 +41,13 @@ public class StringRedisUtils {
 
     /**
      * 删除key
+     * redisTemplate.delete,如果redis中不存在要删除的key，返回false，存在并删除成功返回true
      *
      * @param key
      */
-    public void delete(String key) {
+    public boolean delete(String key) {
 
-        redisTemplate.delete(key);
+        return redisTemplate.delete(key);
     }
 
     /**

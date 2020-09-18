@@ -6,8 +6,6 @@ import java.io.Serializable;
 
 public class JSONResponse implements Serializable{
 
-    private static final long serialVersionUID = 7498483649536881777L;
-
     private Integer status;
 
     private String msg;
