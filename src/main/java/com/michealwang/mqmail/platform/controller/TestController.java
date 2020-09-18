@@ -1,6 +1,10 @@
 package com.michealwang.mqmail.platform.controller;
 
+import com.michealwang.mqmail.common.annotation.AccessLimit;
+import com.michealwang.mqmail.common.annotation.ApiIdempotent;
+import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.common.util.StringRedisUtils;
+import com.michealwang.mqmail.platform.service.TestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,8 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class TestController {
 
-//    @Autowired
-//    private Re jedisUtil;
     @Autowired
     private StringRedisUtils stringRedisUtils;
 
@@ -22,31 +24,20 @@ public class TestController {
     @Qualifier(value = "redisStringTemplate")
     private RedisTemplate StringRedisUtils;
 
-    @RequestMapping("jedis")
-    public String jedis() {
+    @Autowired
+    private TestService testService;
 
-
-
-//        log.info(StringRedisUtils.opsForValue().set("aaa", "aaa"));
-//
-//        stringRedisUtils.set("aaa", "aaa");
-//        stringRedisUtils.set("bbb", "bbb", 10);
-//        log.info(stringRedisUtils.get("aaa"));
-//
-//        log.info(StringRedisUtils.setObject("ccc", "ccc"));
-//        log.info(stringRedisUtils.setObject("ddd", "ddd", 30));
-//        log.info(stringRedisUtils.getObject("ccc").toString());
-//
-//        log.info(stringRedisUtils.keys("ccc").toString());
-//
-//        log.info(stringRedisUtils.expire("aaa", 30) + "");
-//        log.info(stringRedisUtils.ttl("aaa") + "");
-//        log.info(stringRedisUtils.exists("aaa") + "");
-//        log.info(stringRedisUtils.exists("aaaaaa") + "");
-
-        return "hello world";
+    @RequestMapping("/testIdempotence")
+    @ApiIdempotent
+    public JSONResponse testIdempotence(String token) {
+        return testService.testIdempotence();
     }
 
+    @RequestMapping("/testAccessLimit")
+    @AccessLimit(maxCount = 10, seconds = 200)
+    public JSONResponse testAccessLimit() {
+        return testService.testAccessLimit();
+    }
 
 
 }

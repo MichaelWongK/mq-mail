@@ -55,10 +55,6 @@ public class UserController {
         return users.toString();
     }
 
-    @RequestMapping("/testIdempotence")
-    @ApiIdempotent
-    public JSONResponse testIdempotence(String token) {
-        return userService.testIdempotence(token);
-    }
+
 
 }

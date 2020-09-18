@@ -9,19 +9,19 @@ public class ServiceException extends RuntimeException{
 
     private String code;
 
-    private String msg;
+    private String message;
 
 
     public ServiceException() {
     }
 
-    public ServiceException(String msg) {
-        this.msg = msg;
+    public ServiceException(String message) {
+        this.message = message;
     }
 
-    public ServiceException(String code, String msg) {
+    public ServiceException(String code, String message) {
         this.code = code;
-        this.msg = msg;
+        this.message = message;
     }
 
     public String getCode() {
@@ -32,11 +32,12 @@ public class ServiceException extends RuntimeException{
         this.code = code;
     }
 
-    public String getMsg() {
-        return msg;
+    @Override
+    public String getMessage() {
+        return message;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

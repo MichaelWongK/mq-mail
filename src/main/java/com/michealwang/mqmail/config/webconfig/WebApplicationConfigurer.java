@@ -1,5 +1,6 @@
 package com.michealwang.mqmail.config.webconfig;
 
+import com.michealwang.mqmail.common.interceptor.AccessLimitInterceptor;
 import com.michealwang.mqmail.common.interceptor.ApiIdempotentInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,9 +50,17 @@ public class WebApplicationConfigurer implements WebMvcConfigurer {
         return new ApiIdempotentInterceptor();
     }
 
+
+    @Bean
+    public AccessLimitInterceptor accessLimitInterceptor() {
+        return new AccessLimitInterceptor();
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 接口幂等性拦截器
         registry.addInterceptor(apiIdempotentInterceptor());
+        // 限流防刷爆拦截器
+        registry.addInterceptor(accessLimitInterceptor());
     }
 }

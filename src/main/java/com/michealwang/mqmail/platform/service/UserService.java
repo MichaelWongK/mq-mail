@@ -20,5 +20,5 @@ public interface UserService {
 
     List<User> getByUsernameAndPassword(String username, String password);
 
-    JSONResponse testIdempotence(String token);
+
 }

@@ -59,9 +59,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectByUsernameAndPassword(username, password);
     }
 
-    @Override
-    public JSONResponse testIdempotence(String token) {
-        return JSONResponse.success("delete success !");
-    }
+
 
 }
