@@ -6,6 +6,7 @@ import com.michealwang.mqmail.platform.pojo.LoginLog;
 import com.michealwang.mqmail.platform.service.LoginLogService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,10 @@ public class LoginLogConsumer {
     private LoginLogService loginLogService;
 
     @RabbitListener(queues = "log.login.queue")
-    public void LoginLogConsumer(LoginLog loginLog, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+    public void LoginLogConsumer(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
-            log.info("loginLog1 消费消息：{}", loginLog);
+            log.info("loginLog1 消费消息：{}", message.toString());
+            LoginLog loginLog = MessageHelper.msgToObj(message, LoginLog.class);
             loginLog.setId(RandomUtil.generateDigitalStr(5));
             loginLogService.insert(loginLog);
         } catch (Exception e) {

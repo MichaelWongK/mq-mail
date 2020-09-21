@@ -6,6 +6,11 @@ import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
 
+/**
+ * @author <a href="mailto:wangmk13@163.com">micheal.wang</a>
+ * @date 2020/9/21 14:02
+ * @Description 通用Message转换
+ */
 public class MessageHelper {
 
     public static Message objToMsg(Object obj) {
