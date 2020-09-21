@@ -51,10 +51,14 @@ public class UserController {
 
     @GetMapping("users/username_password")
     public String getByUsernameAndPassword(String username, String password) {
-        List<User> users = userService.getByUsernameAndPassword(username, password);
-        return users.toString();
+        User user = userService.getByUsernameAndPassword(username, password);
+        return user.toString();
     }
 
+    @PostMapping("login")
+    public JSONResponse login(String username, String password) {
+        return userService.login(username, password);
+    }
 
 
 }

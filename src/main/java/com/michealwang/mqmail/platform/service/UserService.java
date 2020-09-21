@@ -18,7 +18,8 @@ public interface UserService {
 
     void delete(Integer id);
 
-    List<User> getByUsernameAndPassword(String username, String password);
+    User getByUsernameAndPassword(String username, String password);
 
+    JSONResponse login(String username, String password);
 
 }

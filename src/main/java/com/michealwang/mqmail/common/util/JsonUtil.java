@@ -5,10 +5,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Slf4j
 public class JsonUtil {
@@ -27,6 +34,11 @@ public class JsonUtil {
         objectMapper.setDateFormat(new SimpleDateFormat(DATE_FORMAT));
         // 忽略在json字符串中存在, 但在java对象中不存在对应属性的情况, 防止错误
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        JavaTimeModule javaTimeModule = new JavaTimeModule();
+//        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateUtils.DATE_TIME_FORMAT));
+//        javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateUtils.DATE_TIME_SIMPLE_FORMAT));
+//        javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateUtils.DATE_FORMAT));
+//        objectMapper.registerModule(javaTimeModule);
     }
 
     public static <T> String objToStr(T obj) {

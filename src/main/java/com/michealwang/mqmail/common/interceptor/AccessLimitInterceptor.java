@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:wangmk13@163.com">micheal.wang</a>
  * @date 2020/9/18 16:42
- * @Description
+ * @Description 防刷限流拦截器
  */
 public class AccessLimitInterceptor extends HandlerInterceptorAdapter {
 

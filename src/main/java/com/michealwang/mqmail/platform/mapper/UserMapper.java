@@ -19,5 +19,5 @@ public interface UserMapper {
 
     void delete(Integer id);
 
-    List<User> selectByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
+    User selectByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
 }

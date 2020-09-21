@@ -16,4 +16,11 @@ public class Constant {
         String MSG_CONSUMER_PREFIX = "consumer:";
         String ACCESS_LIMIT_PREFIX = "accessLimit:";
     }
+
+    public interface LogType {
+        Integer LOGIN = 1;// 登录
+        Integer LOGOUT = 2;// 登出
+    }
+
+
 }

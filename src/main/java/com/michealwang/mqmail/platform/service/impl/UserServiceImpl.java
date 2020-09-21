@@ -1,22 +1,26 @@
 package com.michealwang.mqmail.platform.service.impl;
 
+import com.michealwang.mqmail.amqp.consumer.MessageHelper;
+import com.michealwang.mqmail.common.constant.Constant;
 import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.common.json.ResponseCode;
+import com.michealwang.mqmail.common.util.DateUtils;
 import com.michealwang.mqmail.common.util.StringRedisUtils;
-import com.michealwang.mqmail.config.exception.ServiceException;
 import com.michealwang.mqmail.platform.mapper.UserMapper;
+import com.michealwang.mqmail.platform.pojo.LoginLog;
 import com.michealwang.mqmail.platform.pojo.User;
 import com.michealwang.mqmail.platform.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -28,6 +32,14 @@ public class UserServiceImpl implements UserService {
     private StringRedisUtils stringRedisUtils;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    // 直连交换机
+    @Value("${log.login.directexchange}")
+    private   String loginLogExchange;
+    // 日志路由
+    @Value("${log.login.routing}")
+    private String loginLogRoutingKey;
 
     @Override
     public List<User> getAll() {
@@ -55,10 +67,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getByUsernameAndPassword(String username, String password) {
+    public User getByUsernameAndPassword(String username, String password) {
         return userMapper.selectByUsernameAndPassword(username, password);
     }
 
+    @Override
+    public JSONResponse login(String username, String password) {
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+            return JSONResponse.error(ResponseCode.USERNAME_OR_PASSWORD_EMPTY.getMsg());
+        }
+
+        User user = getByUsernameAndPassword(username, password);
+        Assert.notNull(user, ResponseCode.USER_NOT_EXISTS.getMsg());
+
+        LoginLog loginLog = new LoginLog();
+        loginLog.setUserId(user.getId());
+        loginLog.setType(Constant.LogType.LOGIN);
+        loginLog.setDescription(username + "在" + DateUtils.getDateTime() + "登录系统");
+        loginLog.setCreateTime(new Date());
+        loginLog.setUpdateTime(loginLog.getCreateTime());
+        rabbitTemplate.convertAndSend(loginLogExchange, loginLogRoutingKey, loginLog);
+        return JSONResponse.success();
+    }
 
 
 }

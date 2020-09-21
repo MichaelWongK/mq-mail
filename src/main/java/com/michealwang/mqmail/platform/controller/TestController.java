@@ -45,13 +45,13 @@ public class TestController {
         return testService.testAccessLimit();
     }
 
-    @GetMapping("/testRabbitMq")
-    public JSONResponse testRabbitMq() {
-        for (int i=0; i<10; i++) {
-            rabbitTemplate.convertAndSend(RabbitConfig.DIRECT_EXCHANGE_NAME, RabbitConfig.LOG_ROUTING_KEY_NAME, "log msg is " + i);
-        }
-        return JSONResponse.success("mq send success");
-    }
+//    @GetMapping("/testRabbitMq")
+//    public JSONResponse testRabbitMq() {
+//        for (int i=0; i<10; i++) {
+//            rabbitTemplate.convertAndSend(RabbitConfig.DIRECT_EXCHANGE_NAME, RabbitConfig.LOG_ROUTING_KEY_NAME, "log msg is " + i);
+//        }
+//        return JSONResponse.success("mq send success");
+//    }
 
 
 }
