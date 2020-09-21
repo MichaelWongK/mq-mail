@@ -54,6 +54,8 @@ spring:
     publisher-confirm-type: simple
     # ����returnedMessage�ص� Exchange -> Queue
     publisher-returns: true
+    template:
+      mandatory: true # 使用return-callback时必须设置mandatory为true
     # �����ֶ�ȷ��(ack) Queue -> C��
     listener:
       simple:

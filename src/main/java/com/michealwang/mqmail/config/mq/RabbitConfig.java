@@ -38,27 +38,24 @@ public class RabbitConfig {
 
     @Bean
     public RabbitTemplate rabbitTemplate() {
-        connectionFactory.setPublisherConfirmType(rabbitProperties.getPublisherConfirmType());
-        // PublisherReturns 保证消息对Broker端是可达的，如果出现路由键不可达的情况，则使用监听器对不可达的消息进行后续的处理，保证消息的路由成功：RabbitTemplate.ReturnCallback
-        connectionFactory.setPublisherReturns(rabbitProperties.isPublisherReturns());
-
         RabbitTemplate rabbitTemplate =new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(converter());
-        // 使用return-callback时必须设置mandatory为true
-        rabbitTemplate.setMandatory(true);
 
+        // 消息是否成功发送到Exchange
         rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+            log.info("消息发送ack: {}", ack);
             if (ack) {
-                log.info("消息发送成功: correlationData: {}", correlationData);
+                log.info("消息成功发送到Exchange");
             } else {
-                log.info("消息发送失败: correlationData: {}, cause: {}", correlationData, cause);
+                log.info("消息发送到Exchange失败: correlationData: {}, cause: {}", correlationData, cause);
             }
         });
 
+        // 消息是否从Exchange路由到Queue, 注意: 这是一个失败回调, 只有消息从Exchange路由到Queue失败才会回调这个方法
         rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
             @Override
             public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
-                log.info("消息丢失: exchange: {}, route: {}, replyCode: {}, replyText: {}, message: {}",
+                log.info("消息从Exchange路由到Queue失败: exchange: {}, route: {}, replyCode: {}, replyText: {}, message: {}",
                         exchange, routingKey, replyCode, replyText, message);
             }
         });
