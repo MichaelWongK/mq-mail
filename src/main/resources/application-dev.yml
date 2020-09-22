@@ -68,8 +68,4 @@ mybatis-plus:
   # mybatis-config.xml
   config-location: classpath:mybatis/mybatis-config.xml
 
-log:
-  login:
-    directexchange: log.login.direct.exchange
-    queue: log.login.queue
-    routing: log.login.routing
+

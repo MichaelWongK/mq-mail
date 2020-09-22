@@ -26,19 +26,13 @@ import java.util.List;
 @Slf4j
 public class ResendTimeOutMsg {
 
-    // 直连交换机
-    @Value("${log.login.directexchange}")
-    private   String loginLogExchange;
-    // 日志路由
-    @Value("${log.login.routing}")
-    private String loginLogRoutingKey;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private MsgLogMapper msgLogMapper;
 
-    @Scheduled(cron = "0/10 * * * * ?")
+//    @Scheduled(cron = "0/10 * * * * ?")
     public void ResendTimeOutMsg() {
         log.info("···定时任务ResendTimeOutMsg开始···");
 

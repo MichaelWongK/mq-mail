@@ -5,6 +5,7 @@ import com.michealwang.mqmail.common.constant.Constant;
 import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.common.json.ResponseCode;
 import com.michealwang.mqmail.common.util.*;
+import com.michealwang.mqmail.config.mq.RabbitConfig;
 import com.michealwang.mqmail.platform.mapper.MsgLogMapper;
 import com.michealwang.mqmail.platform.mapper.UserMapper;
 import com.michealwang.mqmail.platform.pojo.LoginLog;
@@ -38,12 +39,6 @@ public class UserServiceImpl implements UserService {
     private RedissonClient redissonClient;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-    // 直连交换机
-    @Value("${log.login.directexchange}")
-    private   String loginLogExchange;
-    // 日志路由
-    @Value("${log.login.routing}")
-    private String loginLogRoutingKey;
 
     @Override
     public List<User> getAll() {
@@ -94,9 +89,13 @@ public class UserServiceImpl implements UserService {
      * @param user
      */
     private void saveAndSendMsg(User user) {
-        LoginLog loginLog = new LoginLog();
         String msgId = RandomUtil.UUID32();
+
+        // 消息存入redis
+        stringRedisUtils.set(Constant.Redis.MSG_CONSUMER_PREFIX + msgId, msgId);
+
         // 发送消息
+        LoginLog loginLog = new LoginLog();
         loginLog.setUserId(user.getId());
         loginLog.setType(Constant.LogType.LOGIN);
         Date date = new Date();
@@ -107,13 +106,13 @@ public class UserServiceImpl implements UserService {
 
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(msgId);
-        rabbitTemplate.convertAndSend(loginLogExchange, loginLogRoutingKey, loginLog, correlationData);
+        rabbitTemplate.convertAndSend(RabbitConfig.LOGIN_DIRECT_EXCHANGE_NAME, RabbitConfig.LOGIN_ROUTING_KEY_NAME, loginLog, correlationData);
 
         MsgLog msgLog = new MsgLog();
         msgLog.setMsgId(msgId);
         msgLog.setMsg(JsonUtil.objToStr(loginLog));
-        msgLog.setExchange(loginLogExchange);
-        msgLog.setRoutingKey(loginLogRoutingKey);
+        msgLog.setExchange(RabbitConfig.LOGIN_DIRECT_EXCHANGE_NAME);
+        msgLog.setRoutingKey(RabbitConfig.LOGIN_ROUTING_KEY_NAME);
         msgLog.setStatus(Constant.MsgLogStatus.SENDING);
         msgLog.setTryCount(0);
         msgLog.setCreateTime(date);

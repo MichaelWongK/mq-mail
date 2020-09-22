@@ -24,15 +24,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    // 直连交换机
-    @Value("${log.login.directexchange}")
-    private   String loginLogExchange;
-    // 日志队列
-    @Value("${log.login.queue}")
-    private String loginLogQueueName;
-    // 日志路由
-    @Value("${log.login.routing}")
-    private String loginLogRoutingKey;
     @Autowired
     private MsgLogMapper msgLogMapper;
 
@@ -79,9 +70,17 @@ public class RabbitConfig {
         return new Jackson2JsonMessageConverter();
     }
 
+
+    // 直连交换机
+    public static final String LOGIN_DIRECT_EXCHANGE_NAME = "log.login.direct.exchange";
+    // 日志队列
+    public static final String LOGIN_QUEUE_NAME = "log.login.queue";
+    // 日志路由
+    public static final String LOGIN_ROUTING_KEY_NAME = "log.login.routing";
+
     @Bean
     public Queue loginLogQueue() {
-        return new Queue(loginLogQueueName, true);
+        return new Queue(LOGIN_QUEUE_NAME, true);
     }
 
     /**
@@ -91,7 +90,7 @@ public class RabbitConfig {
      */
     @Bean
     public DirectExchange loginLogDirectExchange() {
-        return new DirectExchange(loginLogExchange, true, false);
+        return new DirectExchange(LOGIN_DIRECT_EXCHANGE_NAME, true, false);
     }
 
     /**
@@ -100,6 +99,6 @@ public class RabbitConfig {
      */
     @Bean
     public Binding loginLogBinding() {
-        return BindingBuilder.bind(loginLogQueue()).to(loginLogDirectExchange()).with(loginLogRoutingKey);
+        return BindingBuilder.bind(loginLogQueue()).to(loginLogDirectExchange()).with(LOGIN_ROUTING_KEY_NAME);
     }
 }
