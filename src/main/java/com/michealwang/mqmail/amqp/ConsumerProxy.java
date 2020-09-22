@@ -1,4 +1,4 @@
-package com.michealwang.mqmail.amqp.consumer;
+package com.michealwang.mqmail.amqp;
 
 import com.michealwang.mqmail.common.constant.Constant;
 import com.michealwang.mqmail.common.util.StringRedisUtils;

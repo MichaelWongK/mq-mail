@@ -1,13 +1,13 @@
 package com.michealwang.mqmail.amqp.consumer;
 
+import com.michealwang.mqmail.amqp.MessageHelper;
+import com.michealwang.mqmail.amqp.base.BaseConsumer;
 import com.michealwang.mqmail.common.util.RandomUtil;
 import com.michealwang.mqmail.platform.pojo.LoginLog;
 import com.michealwang.mqmail.platform.service.LoginLogService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,5 @@
 package com.michealwang.mqmail.platform.service.impl;
 
-import com.michealwang.mqmail.amqp.consumer.MessageHelper;
 import com.michealwang.mqmail.common.constant.Constant;
 import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.common.json.ResponseCode;
@@ -18,7 +17,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -113,7 +111,7 @@ public class UserServiceImpl implements UserService {
         msgLog.setMsg(JsonUtil.objToStr(loginLog));
         msgLog.setExchange(RabbitConfig.LOGIN_DIRECT_EXCHANGE_NAME);
         msgLog.setRoutingKey(RabbitConfig.LOGIN_ROUTING_KEY_NAME);
-        msgLog.setStatus(Constant.MsgLogStatus.SENDING);
+        msgLog.setStatus(Constant.MsgLogStatus.DELIVERING);
         msgLog.setTryCount(0);
         msgLog.setCreateTime(date);
         msgLog.setUpdateTime(date);

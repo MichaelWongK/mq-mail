@@ -1,5 +1,8 @@
-package com.michealwang.mqmail.amqp.consumer;
+package com.michealwang.mqmail.amqp.listener;
 
+import com.michealwang.mqmail.amqp.ConsumerProxy;
+import com.michealwang.mqmail.amqp.base.BaseConsumer;
+import com.michealwang.mqmail.amqp.consumer.LoginLogConsumer;
 import com.michealwang.mqmail.common.util.StringRedisUtils;
 import com.michealwang.mqmail.config.mq.RabbitConfig;
 import com.rabbitmq.client.Channel;

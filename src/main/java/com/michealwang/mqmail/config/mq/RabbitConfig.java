@@ -46,7 +46,7 @@ public class RabbitConfig {
                 String msgId = correlationData.getId();
                 MsgLog msgLog = new MsgLog();
                 msgLog.setMsgId(msgId);
-                msgLog.setStatus(Constant.MsgLogStatus.SUCCESS);
+                msgLog.setStatus(Constant.MsgLogStatus.DELIVER_SUCCESS);
                 msgLogMapper.updateStatus(msgLog);
             } else {
                 log.info("消息发送到Exchange失败: correlationData: {}, cause: {}", correlationData, cause);
@@ -100,5 +100,25 @@ public class RabbitConfig {
     @Bean
     public Binding loginLogBinding() {
         return BindingBuilder.bind(loginLogQueue()).to(loginLogDirectExchange()).with(LOGIN_ROUTING_KEY_NAME);
+    }
+
+    // 发送邮件
+    public static final String MAIL_QUEUE_NAME = "mail.queue";
+    public static final String MAIL_EXCHANGE_NAME = "mail.exchange";
+    public static final String MAIL_ROUTING_KEY_NAME = "mail.routing.key";
+
+    @Bean
+    public Queue mailQueue() {
+        return new Queue(MAIL_QUEUE_NAME, true);
+    }
+
+    @Bean
+    public DirectExchange mailExchange() {
+        return new DirectExchange(MAIL_EXCHANGE_NAME, true, false);
+    }
+
+    @Bean
+    public Binding mailBinding() {
+        return BindingBuilder.bind(mailQueue()).to(mailExchange()).with(MAIL_ROUTING_KEY_NAME);
     }
 }

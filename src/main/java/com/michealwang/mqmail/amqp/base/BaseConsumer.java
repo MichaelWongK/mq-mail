@@ -1,4 +1,4 @@
-package com.michealwang.mqmail.amqp.consumer;
+package com.michealwang.mqmail.amqp.base;
 
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;

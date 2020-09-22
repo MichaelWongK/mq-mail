@@ -23,13 +23,13 @@ public class MailTest {
 
     @Test
     public void send() {
-        mailUtil.send("912570281@qq.com", "日志标题", "邮件正文内容哦哦哦哦哦哦哦哦哦");
+//        mailUtil.send("912570281@qq.com", "日志标题", "邮件正文内容哦哦哦哦哦哦哦哦哦");
     }
 
     @Test
     public void sendAttachment() {
         File file = new File("C:/Users/wangm/Desktop/正则思维导图.jpg");
-        mailUtil.send("912570281@qq.com", "日志标题", "邮件正文内容哦哦哦哦哦哦哦哦哦", file);
+//        mailUtil.send("912570281@qq.com", "日志标题", "邮件正文内容哦哦哦哦哦哦哦哦哦", file);
     }
 
 }

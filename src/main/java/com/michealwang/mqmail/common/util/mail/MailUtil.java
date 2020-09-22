@@ -1,5 +1,6 @@
 package com.michealwang.mqmail.common.util.mail;
 
+import com.michealwang.mqmail.platform.pojo.Mail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,47 +33,47 @@ public class MailUtil {
     /**
      *  发送简单邮件
      *
-     * @param to        目标邮箱
-     * @param title     邮件标题
-     * @param content   邮件正文
+     * @param mail
      */
-    public void send(String to, String title, String content) {
+    public boolean send(Mail mail) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(from);
-        simpleMailMessage.setTo(to);
-        simpleMailMessage.setSubject(title);
-        simpleMailMessage.setText(content);
+        simpleMailMessage.setTo(mail.getTo());
+        simpleMailMessage.setSubject(mail.getTitle());
+        simpleMailMessage.setText(mail.getContent());
         try {
             mailSender.send(simpleMailMessage);
-            log.info("邮件发送成功, to: {}, title：{}", to, title);
+            log.info("邮件发送成功, mail: {}", mail);
+            return true;
         } catch (MailException e) {
-            log.error("邮件发送失败, to: {}, title: {}", to, title, e);
+            log.error("邮件发送失败, mail: {}", mail, e);
         }
+        return false;
     }
 
     /**
      * 发送附件邮件
      *
-     * @param to
-     * @param title
-     * @param content
+     * @param mail
      * @param file    附件
      */
-    public void send(String to, String title, String content, File file) {
+    public boolean send(Mail mail, File file) {
         MimeMessage message = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setFrom(from);
-            helper.setTo(to);
-            helper.setSubject(title);
-            helper.setText(content);
+            helper.setTo(mail.getTo());
+            helper.setSubject(mail.getTitle());
+            helper.setText(mail.getContent());
             FileSystemResource resource = new FileSystemResource(file);
             String fileName = resource.getFilename();
             helper.addAttachment(fileName, resource);
             mailSender.send(message);
             log.info("附件邮件发送成功");
+            return true;
         } catch (Exception e) {
-            log.error("附件邮件发送失败, to: {}, title: {}", to, title, e);
+            log.error("附件邮件发送失败, mail: {}", mail, e);
         }
+        return false;
     }
 }
