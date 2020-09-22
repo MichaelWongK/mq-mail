@@ -9,7 +9,7 @@ spring:
 
   # redis
   redis:
-    host: micheal.wang
+    host: www.micheal.wang
     port: 26379
     password: micheal13
     lettuce:

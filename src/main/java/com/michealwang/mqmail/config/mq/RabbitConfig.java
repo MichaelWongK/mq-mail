@@ -1,5 +1,9 @@
 package com.michealwang.mqmail.config.mq;
 
+import com.michealwang.mqmail.common.constant.Constant;
+import com.michealwang.mqmail.platform.mapper.MsgLogMapper;
+import com.michealwang.mqmail.platform.mapper.UserMapper;
+import com.michealwang.mqmail.platform.pojo.MsgLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -29,12 +33,12 @@ public class RabbitConfig {
     // 日志路由
     @Value("${log.login.routing}")
     private String loginLogRoutingKey;
+    @Autowired
+    private MsgLogMapper msgLogMapper;
 
     @Autowired
     private CachingConnectionFactory connectionFactory;
 
-    @Autowired
-    private RabbitProperties rabbitProperties;
 
     @Bean
     public RabbitTemplate rabbitTemplate() {
@@ -46,6 +50,13 @@ public class RabbitConfig {
             log.info("消息发送ack: {}", ack);
             if (ack) {
                 log.info("消息成功发送到Exchange");
+
+                // 修改消息状态为成功
+                String msgId = correlationData.getId();
+                MsgLog msgLog = new MsgLog();
+                msgLog.setMsgId(msgId);
+                msgLog.setStatus(Constant.MsgLogStatus.SUCCESS);
+                msgLogMapper.updateStatus(msgLog);
             } else {
                 log.info("消息发送到Exchange失败: correlationData: {}, cause: {}", correlationData, cause);
             }

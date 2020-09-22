@@ -4,15 +4,17 @@ import com.michealwang.mqmail.amqp.consumer.MessageHelper;
 import com.michealwang.mqmail.common.constant.Constant;
 import com.michealwang.mqmail.common.json.JSONResponse;
 import com.michealwang.mqmail.common.json.ResponseCode;
-import com.michealwang.mqmail.common.util.DateUtils;
-import com.michealwang.mqmail.common.util.StringRedisUtils;
+import com.michealwang.mqmail.common.util.*;
+import com.michealwang.mqmail.platform.mapper.MsgLogMapper;
 import com.michealwang.mqmail.platform.mapper.UserMapper;
 import com.michealwang.mqmail.platform.pojo.LoginLog;
+import com.michealwang.mqmail.platform.pojo.MsgLog;
 import com.michealwang.mqmail.platform.pojo.User;
 import com.michealwang.mqmail.platform.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private MsgLogMapper msgLogMapper;
     @Autowired
     private StringRedisUtils stringRedisUtils;
     @Autowired
@@ -80,14 +84,43 @@ public class UserServiceImpl implements UserService {
         User user = getByUsernameAndPassword(username, password);
         Assert.notNull(user, ResponseCode.USER_NOT_EXISTS.getMsg());
 
+        saveAndSendMsg(user);
+
+        return JSONResponse.success();
+    }
+
+    /**
+     * 保存并发送消息
+     * @param user
+     */
+    private void saveAndSendMsg(User user) {
         LoginLog loginLog = new LoginLog();
+        String msgId = RandomUtil.UUID32();
+        // 发送消息
         loginLog.setUserId(user.getId());
         loginLog.setType(Constant.LogType.LOGIN);
-        loginLog.setDescription(username + "在" + DateUtils.getDateTime() + "登录系统");
-        loginLog.setCreateTime(new Date());
-        loginLog.setUpdateTime(loginLog.getCreateTime());
-        rabbitTemplate.convertAndSend(loginLogExchange, loginLogRoutingKey, loginLog);
-        return JSONResponse.success();
+        Date date = new Date();
+        loginLog.setDescription(user.getUsername() + "在" + JodaTimeUtil.dateToStr(date) + "登录系统");
+        loginLog.setCreateTime(date);
+        loginLog.setUpdateTime(date);
+        loginLog.setMsgId(msgId);
+
+        CorrelationData correlationData = new CorrelationData();
+        correlationData.setId(msgId);
+        rabbitTemplate.convertAndSend(loginLogExchange, loginLogRoutingKey, loginLog, correlationData);
+
+        MsgLog msgLog = new MsgLog();
+        msgLog.setMsgId(msgId);
+        msgLog.setMsg(JsonUtil.objToStr(loginLog));
+        msgLog.setExchange(loginLogExchange);
+        msgLog.setRoutingKey(loginLogRoutingKey);
+        msgLog.setStatus(Constant.MsgLogStatus.SENDING);
+        msgLog.setTryCount(0);
+        msgLog.setCreateTime(date);
+        msgLog.setUpdateTime(date);
+        msgLog.setNextTryTime(JodaTimeUtil.plusMinutes(date, 1));
+        msgLogMapper.insert(msgLog);
+
     }
 
 

@@ -22,5 +22,9 @@ public class Constant {
         Integer LOGOUT = 2;// 登出
     }
 
-
+    public interface MsgLogStatus {
+        Integer SENDING = 0;
+        Integer SUCCESS = 1;
+        Integer FAIL = 2;
+    }
 }
