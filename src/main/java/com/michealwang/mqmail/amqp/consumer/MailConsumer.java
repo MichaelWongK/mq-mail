@@ -1,8 +1,10 @@
 package com.michealwang.mqmail.amqp.consumer;
 
 import com.michealwang.mqmail.amqp.MessageHelper;
+import com.michealwang.mqmail.amqp.base.BaseConsumer;
 import com.michealwang.mqmail.common.constant.Constant;
 import com.michealwang.mqmail.common.util.mail.MailUtil;
+import com.michealwang.mqmail.config.exception.ServiceException;
 import com.michealwang.mqmail.config.mq.RabbitConfig;
 import com.michealwang.mqmail.platform.mapper.MsgLogMapper;
 import com.michealwang.mqmail.platform.pojo.Mail;
@@ -23,38 +25,19 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-public class MailConsumer {
+public class MailConsumer implements BaseConsumer {
 
-    @Autowired
-    private MsgLogMapper msgLogMapper;
     @Autowired
     private MailUtil mailUtil;
 
-    @RabbitListener(queues = RabbitConfig.MAIL_QUEUE_NAME)
-    public void consume(Message message, Channel channel) throws IOException {
+    @Override
+    public void consume(Message message, Channel channel) {
 
+        log.info("mail consumer 收到消息: {}", message);
         Mail mail = MessageHelper.msgToObj(message, Mail.class);
-        log.info("收到消息: {}", mail.toString());
-
-        String msgId = mail.getMsgId();
-
-        MsgLog msgLog = msgLogMapper.selectByPrimaryKey(msgId);
-        // 消费幂等性
-        if (null == msgLog || msgLog.getStatus().equals(Constant.MsgLogStatus.CONSUMED_SUCCESS)) {
-            log.info("重复消费, msgId: {}", msgId);
-            return;
-        }
-
-        long tag = message.getMessageProperties().getDeliveryTag();
         boolean flag = mailUtil.send(mail);
-        if (flag) {
-            MsgLog msgLog1 = new MsgLog();
-            msgLog1.setMsgId(msgId);
-            msgLog1.setStatus(Constant.MsgLogStatus.CONSUMED_SUCCESS);
-            msgLogMapper.updateStatus(msgLog1);
-            channel.basicAck(tag, false);// 消费确认
-        } else {
-            channel.basicNack(tag, false, true);
+        if (!flag) {
+            throw new ServiceException("send mail error");
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.michealwang.mqmail.platform.mapper;
 
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.michealwang.mqmail.platform.pojo.MsgLog;
 import org.springframework.stereotype.Repository;

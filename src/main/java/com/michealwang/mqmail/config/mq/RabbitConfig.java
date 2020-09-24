@@ -1,17 +1,14 @@
 package com.michealwang.mqmail.config.mq;
 
 import com.michealwang.mqmail.common.constant.Constant;
-import com.michealwang.mqmail.platform.mapper.MsgLogMapper;
-import com.michealwang.mqmail.platform.mapper.UserMapper;
 import com.michealwang.mqmail.platform.pojo.MsgLog;
+import com.michealwang.mqmail.platform.service.MsgLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
 
     @Autowired
-    private MsgLogMapper msgLogMapper;
+    private MsgLogService msgLogService;
 
     @Autowired
     private CachingConnectionFactory connectionFactory;
@@ -44,10 +41,7 @@ public class RabbitConfig {
 
                 // 修改消息状态为成功
                 String msgId = correlationData.getId();
-                MsgLog msgLog = new MsgLog();
-                msgLog.setMsgId(msgId);
-                msgLog.setStatus(Constant.MsgLogStatus.DELIVER_SUCCESS);
-                msgLogMapper.updateStatus(msgLog);
+                msgLogService.updateStatus(msgId, Constant.MsgLogStatus.DELIVER_SUCCESS);
             } else {
                 log.info("消息发送到Exchange失败: correlationData: {}, cause: {}", correlationData, cause);
             }

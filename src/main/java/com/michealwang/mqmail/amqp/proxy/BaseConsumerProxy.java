@@ -1,9 +1,10 @@
-package com.michealwang.mqmail.amqp;
+package com.michealwang.mqmail.amqp.proxy;
 
 import com.michealwang.mqmail.common.constant.Constant;
-import com.michealwang.mqmail.common.util.StringRedisUtils;
+import com.michealwang.mqmail.platform.pojo.MsgLog;
+import com.michealwang.mqmail.platform.service.MsgLogService;
+import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
@@ -16,14 +17,14 @@ import java.util.Map;
  * @Description consume 动态代理
  */
 @Slf4j
-public class ConsumerProxy {
+public class BaseConsumerProxy {
 
     private Object target;
-    private StringRedisUtils stringRedisUtils;
+    private MsgLogService msgLogService;
 
-    public ConsumerProxy(Object target, StringRedisUtils stringRedisUtils) {
+    public BaseConsumerProxy(Object target, MsgLogService msgLogService) {
         this.target = target;
-        this.stringRedisUtils = stringRedisUtils;
+        this.msgLogService = msgLogService;
     }
 
     public Object getProxy() {
@@ -32,13 +33,29 @@ public class ConsumerProxy {
 
         Object proxy = Proxy.newProxyInstance(classLoader, interfaces, (proxy1, method, args) -> {
             Message message = (Message) args[0];
+            Channel channel = (Channel) args[1];
+
+            String correlationId = getCorrelationId(message);
             // 保证消费幂等性, 避免消息被重复消费
-            if (isConsumed(message)) {
-                log.info("重复消费, correlationId: {}", getCorrelationId(message));
+            if (isConsumed(correlationId)) {
+                log.info("重复消费, correlationId: {}", correlationId);
                 return null;
             }
-            Object result = method.invoke(target, args);
-            return result;
+
+            Long tag = message.getMessageProperties().getDeliveryTag();
+
+            try {
+                Object result = method.invoke(target, args);
+                // 更新消息状态为已消费
+                msgLogService.updateStatus(correlationId, Constant.MsgLogStatus.CONSUMED_SUCCESS);
+                // 消费确认
+                channel.basicAck(tag, false);
+                return result;
+            } catch (Exception e) {
+                log.error(">>>>>getProxy error: ", e);
+                channel.basicNack(tag, false, true);
+                return null;
+            }
         });
 
         return proxy;
@@ -46,22 +63,14 @@ public class ConsumerProxy {
 
     /**
      * 消息是否已被消费
-     * @param message
+     * @param correlationId
      * @return
      */
-    private boolean isConsumed(Message message) {
-        if (null == message) {
-            return true;
-        }
+    private boolean isConsumed(String correlationId) {
+        MsgLog msgLog = msgLogService.selectByMsgId(correlationId);
 
-        String correlationId = getCorrelationId(message);
-        if (StringUtils.isBlank(correlationId)) {
-            return true;
-        }
-
-        boolean flag = stringRedisUtils.delete(Constant.Redis.MSG_CONSUMER_PREFIX + correlationId);
-        if (!flag) {
-            // 删除失败，说明已消费
+        if (null == msgLog || msgLog.getStatus().equals(Constant.MsgLogStatus.CONSUMED_SUCCESS)) {
+            // 删除不存在或者消息已经是已消费状态，说明已消费
             return true;
         }
 

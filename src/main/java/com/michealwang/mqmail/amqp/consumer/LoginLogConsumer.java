@@ -27,20 +27,9 @@ public class LoginLogConsumer implements BaseConsumer {
 
     @Override
     public void consume(Message message, Channel channel) throws IOException {
-        long tag =message.getMessageProperties().getDeliveryTag();
-        try {
             log.info("loginLog1 消费消息：{}", message.toString());
             LoginLog loginLog = MessageHelper.msgToObj(message, LoginLog.class);
             loginLog.setId(RandomUtil.generateDigitalStr(5));
-            LoginLog lLog = loginLogService.selectByMsgId(loginLog.getMsgId());
-            if (null == lLog) {
-                loginLogService.insert(loginLog);
-            }
-        } catch (Exception e) {
-            log.error("logUserConsumer error:" + e);
-            channel.basicNack(tag, false, true);
-        } finally {
-            channel.basicAck(tag, false);
-        }
+            loginLogService.insert(loginLog);
     }
 }

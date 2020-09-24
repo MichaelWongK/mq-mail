@@ -17,7 +17,6 @@
         msg_id, msg, exchange, routing_key, status, try_count, next_try_time, create_time, update_time
     </sql>
 
-
     <update id="updateStatus" parameterType="com.michealwang.mqmail.platform.pojo.MsgLog">
         update msg_log set status = #{status}, update_time = now()
         where msg_id = #{msgId}
