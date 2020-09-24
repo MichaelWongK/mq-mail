@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class ResendTimeOutMsg {
+public class ResendMsg {
 
 
     @Autowired
@@ -33,7 +34,10 @@ public class ResendTimeOutMsg {
     // 最大投递次数
     private static final int MAX_TRY_COUNT = 3;
 
-//    @Scheduled(cron = "0/10 * * * * ?")
+    /**
+     * 每30s拉取投递失败的消息, 重新投递
+     */
+    @Scheduled(cron = "0/10 * * * * ?")
     public void ResendTimeOutMsg() {
         log.info("···定时任务ResendTimeOutMsg开始···");
 
